@@ -58,9 +58,9 @@ class JSONEncoding extends Encoding {
         {
             return new Folder(entry.has("ID") ? entry.getString("ID") : null, entry.has("Name") ? entry.getString("Name") : null);
         }
-        else if (aClass.equals(IncomingMessage.class))
+        else if (aClass.equals(InboxMessage.class))
         {
-            return new IncomingMessage(entry.getString("ID"), entry.getString("PhoneNumber"), entry.getString("Subject"), entry.getString("Message"), entry.getBoolean("New") ? 1 : 0, entry.getString("FolderID"), entry.getString("ContactID"), entry.getString("ReceivedOn"));
+            return new InboxMessage(entry.getString("ID"), entry.getString("PhoneNumber"), entry.getString("Subject"), entry.getString("Message"), entry.getBoolean("New") ? 1 : 0, entry.getString("FolderID"), entry.getString("ContactID"), entry.getString("ReceivedOn"));
         }
 
         return null;

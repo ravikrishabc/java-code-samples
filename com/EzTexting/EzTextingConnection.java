@@ -123,15 +123,15 @@ public class EzTextingConnection {
     }
 
     /**
-     * Get IncomingMessage by ID.
+     * Get InboxMessage by ID.
      * @param id
      * @return
      * @throws IOException
      * @throws EzTextingException
      * @throws Exception
      */
-    public IncomingMessage getIncomingMessage(String id) throws IOException, EzTextingException, Exception {
-        return (IncomingMessage) get(new IncomingMessage(id));
+    public InboxMessage getInboxMessage(String id) throws IOException, EzTextingException, Exception {
+        return (InboxMessage) get(new InboxMessage(id));
     }
 
     public BaseObject get(BaseObject object) throws IOException, EzTextingException, Exception {
@@ -220,7 +220,7 @@ public class EzTextingConnection {
      * @throws EzTextingException
      * @throws Exception
      */
-    public List<BaseObject> getIncomingMessages(String folderId, String search, String sortBy, String sortDir, String itemsPerPage, String page) throws IOException, EzTextingException, Exception {
+    public List<BaseObject> getInboxMessages(String folderId, String search, String sortBy, String sortDir, String itemsPerPage, String page) throws IOException, EzTextingException, Exception {
         Hashtable<String, Object> params = new Hashtable<String, Object>();
         BaseObject.putNotNull(params, "FolderID", folderId);
         BaseObject.putNotNull(params, "Search", search);
@@ -228,7 +228,7 @@ public class EzTextingConnection {
         BaseObject.putNotNull(params, "sortDir", sortDir);
         BaseObject.putNotNull(params, "itemsPerPage",itemsPerPage );
         BaseObject.putNotNull(params, "page", page);
-        BaseObject g = new IncomingMessage(null);
+        BaseObject g = new InboxMessage(null);
         String response = get(g.getBaseUrl(), params);
         return encoding.parseObjectsResponse((Class<BaseObject>) g.getClass(), response);
     }
@@ -237,7 +237,7 @@ public class EzTextingConnection {
         Hashtable<String, Object> params = new Hashtable<String, Object>();
         BaseObject.putNotNull(params, "ID", messageId);
         BaseObject.putNotNull(params, "FolderID", folderId);
-        BaseObject g = new IncomingMessage(null);
+        BaseObject g = new InboxMessage(null);
         post(g.getBaseUrl()+"/?_method=move-to-folder", params);
     }
 
@@ -245,7 +245,7 @@ public class EzTextingConnection {
         Hashtable<String, Object> params = new Hashtable<String, Object>();
         params.put("ID", messageIds);
         BaseObject.putNotNull(params, "FolderID", folderId);
-        BaseObject g = new IncomingMessage(null);
+        BaseObject g = new InboxMessage(null);
         post(g.getBaseUrl()+"/?_method=move-to-folder", params);
     }
 
