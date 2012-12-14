@@ -64,8 +64,8 @@ public class Contact extends BaseObject {
     }
 
     @Override
-    Hashtable<String,String> getParams() {
-        Hashtable<String,String> res = new Hashtable<String,String>();
+    Hashtable<String,Object> getParams() {
+        Hashtable<String,Object> res = new Hashtable<String,Object>();
         putNotNull(res, "PhoneNumber", phoneNumber);
         putNotNull(res, "FirstName", firstName);
         putNotNull(res, "LastName", lastName);

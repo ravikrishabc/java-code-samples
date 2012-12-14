@@ -63,7 +63,14 @@ public class XMLEncoding extends Encoding {
         {
             return new Group(entry.getChildText("ID"), entry.getChildText("Name"), entry.getChildText("Note"), Integer.parseInt(entry.getChildText("ContactCount")));
         }
-
+        else if (aClass.equals(Folder.class))
+        {
+            return new Folder(entry.getChildText("ID"), entry.getChildText("Name"));
+        }
+        else if (aClass.equals(IncomingMessage.class))
+        {
+            return new IncomingMessage(entry.getChildText("ID"), entry.getChildText("PhoneNumber"), entry.getChildText("Subject"), entry.getChildText("Message"), Integer.parseInt(entry.getChildText("New")), entry.getChildText("FolderID"), entry.getChildText("ContactID"), entry.getChildText("ReceivedOn"));
+        }
         return null;
     }
 

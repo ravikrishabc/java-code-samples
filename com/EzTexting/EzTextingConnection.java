@@ -68,7 +68,11 @@ public class EzTextingConnection {
      */
     public BaseObject update(BaseObject object) throws IOException, EzTextingException, Exception {
         String response = post(object.getUpdateUrl(), object.getParams());
-        return encoding.parseObjectResponse((Class<BaseObject>) object.getClass(), response);
+        if (object.hasResponseAfterUpdate())
+        {
+            return encoding.parseObjectResponse((Class<BaseObject>) object.getClass(), response);
+        }
+        return null;
     }
 
     /**
@@ -106,6 +110,30 @@ public class EzTextingConnection {
         return (Group) get(new Group(id));
     }
 
+    /**
+     * Get folder by ID.
+     * @param id
+     * @return
+     * @throws IOException
+     * @throws EzTextingException
+     * @throws Exception
+     */
+    public Folder getFolder(String id) throws IOException, EzTextingException, Exception {
+        return (Folder) get(new Folder(id));
+    }
+
+    /**
+     * Get IncomingMessage by ID.
+     * @param id
+     * @return
+     * @throws IOException
+     * @throws EzTextingException
+     * @throws Exception
+     */
+    public IncomingMessage getIncomingMessage(String id) throws IOException, EzTextingException, Exception {
+        return (IncomingMessage) get(new IncomingMessage(id));
+    }
+
     public BaseObject get(BaseObject object) throws IOException, EzTextingException, Exception {
         String response = get(object.getUpdateUrl());
         return encoding.parseObjectResponse((Class<BaseObject>) object.getClass(), response);
@@ -126,7 +154,7 @@ public class EzTextingConnection {
      */
     public List<BaseObject> getContacts(String query, String source, String optout, String group, String sortBy, String sortDir,
                                         String itemsPerPage, String page) throws IOException, EzTextingException, Exception {
-        Hashtable<String, String> params = new Hashtable<String, String>();
+        Hashtable<String, Object> params = new Hashtable<String, Object>();
         BaseObject.putNotNull(params, "query", query);
         BaseObject.putNotNull(params, "source", source);
         BaseObject.putNotNull(params, "optout", optout);
@@ -153,7 +181,7 @@ public class EzTextingConnection {
      * @throws Exception
      */
     public List<BaseObject> getGroups(String sortBy, String sortDir, String itemsPerPage, String page) throws IOException, EzTextingException, Exception {
-        Hashtable<String, String> params = new Hashtable<String, String>();
+        Hashtable<String, Object> params = new Hashtable<String, Object>();
         BaseObject.putNotNull(params, "sortBy", sortBy);
         BaseObject.putNotNull(params, "sortDir", sortDir);
         BaseObject.putNotNull(params, "itemsPerPage",itemsPerPage );
@@ -163,11 +191,69 @@ public class EzTextingConnection {
         return encoding.parseObjectsResponse((Class<BaseObject>) g.getClass(), response);
     }
 
-    private String get(String relUrl) throws IOException, EzTextingException, Exception {
-        return get(relUrl, new Hashtable<String, String>());
+    /**
+     * Get all Folders in your Ez Texting Inbox.
+     *
+     * @return
+     * @throws IOException
+     * @throws EzTextingException
+     * @throws Exception
+     */
+    public List<BaseObject> getFolders() throws IOException, EzTextingException, Exception {
+        Hashtable<String, Object> params = new Hashtable<String, Object>();
+        BaseObject g = new Folder(null);
+        String response = get(g.getBaseUrl(), params);
+        return encoding.parseObjectsResponse((Class<BaseObject>) g.getClass(), response);
     }
 
-    private String get(String relUrl, Hashtable<String, String> getParams) throws IOException, EzTextingException, Exception {
+    /**
+     * Get all incoming text messages in your Ez Texting Inbox.
+     *
+     * @param folderId (Optional) Get messages from the selected folder. If FolderID is not given then request will return messages in your Inbox and all folders.
+     * @param search (Optional) Get messages which contain selected text or which are sent from selected phone number.
+     * @param sortBy (Optional) Property to sort by. Available values: ReceivedOn, PhoneNumber, Message
+     * @param sortDir (Optional) Direction of sorting. Available values: asc, desc
+     * @param itemsPerPage (Optional) Number of results to retrieve. By default, first 10 groups sorted in alphabetical order are retrieved.
+     * @param page (Optional) Page of results to retrieve
+     * @return
+     * @throws IOException
+     * @throws EzTextingException
+     * @throws Exception
+     */
+    public List<BaseObject> getIncomingMessages(String folderId, String search, String sortBy, String sortDir, String itemsPerPage, String page) throws IOException, EzTextingException, Exception {
+        Hashtable<String, Object> params = new Hashtable<String, Object>();
+        BaseObject.putNotNull(params, "FolderID", folderId);
+        BaseObject.putNotNull(params, "Search", search);
+        BaseObject.putNotNull(params, "sortBy", sortBy);
+        BaseObject.putNotNull(params, "sortDir", sortDir);
+        BaseObject.putNotNull(params, "itemsPerPage",itemsPerPage );
+        BaseObject.putNotNull(params, "page", page);
+        BaseObject g = new IncomingMessage(null);
+        String response = get(g.getBaseUrl(), params);
+        return encoding.parseObjectsResponse((Class<BaseObject>) g.getClass(), response);
+    }
+
+    public void moveMessageToFolder(String messageId, String folderId) throws IOException, EzTextingException, Exception {
+        Hashtable<String, Object> params = new Hashtable<String, Object>();
+        BaseObject.putNotNull(params, "ID", messageId);
+        BaseObject.putNotNull(params, "FolderID", folderId);
+        BaseObject g = new IncomingMessage(null);
+        post(g.getBaseUrl()+"/?_method=move-to-folder", params);
+    }
+
+    public void moveMessagesToFolder(List<String> messageIds, String folderId) throws IOException, EzTextingException, Exception {
+        Hashtable<String, Object> params = new Hashtable<String, Object>();
+        params.put("ID", messageIds);
+        BaseObject.putNotNull(params, "FolderID", folderId);
+        BaseObject g = new IncomingMessage(null);
+        post(g.getBaseUrl()+"/?_method=move-to-folder", params);
+    }
+
+    private String get(String relUrl) throws IOException, EzTextingException, Exception {
+        return get(relUrl, new Hashtable<String, Object>());
+    }
+
+    private String get(String relUrl, Hashtable<String, Object> getParams) throws IOException, EzTextingException, Exception {
         String fullUrl = addUrlParam(baseUrl+relUrl, encoding.getEncodingParam());
         addLoginInfo(getParams);
 
@@ -194,12 +280,12 @@ public class EzTextingConnection {
         return res;
     }
 
-    private void addLoginInfo(Hashtable<String, String> requestParams) {
+    private void addLoginInfo(Hashtable<String, Object> requestParams) {
         requestParams.put("User", user);
         requestParams.put("Password", password);
     }
 
-    private String post(String relUrl, Hashtable<String, String> postParams) throws IOException, EzTextingException, Exception {
+    private String post(String relUrl, Hashtable<String, Object> postParams) throws IOException, EzTextingException, Exception {
         String fullUrl = addUrlParam(baseUrl+relUrl, encoding.getEncodingParam());
         URL url = new URL(fullUrl);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -239,12 +325,25 @@ public class EzTextingConnection {
         return res;
     }
 
-    private static String encodeParams(Hashtable<String, String> params) throws UnsupportedEncodingException {
+    private static String encodeParams(Hashtable<String, Object> params) throws UnsupportedEncodingException {
         String res = "";
         Enumeration<String> keys = params.keys();
         while (keys.hasMoreElements()) {
             String key = keys.nextElement();
-            res += "&"+key+"="+ java.net.URLEncoder.encode(params.get(key), "ISO-8859-1");
+            Object val = params.get(key);
+            if (val instanceof String)
+            {
+                String sval = (String) val;
+                res += "&"+key+"="+ java.net.URLEncoder.encode(sval, "ISO-8859-1");
+            }
+            else
+            {   // this should be List<String>, put multiple values to the same key
+                List<String> lval = (List<String>) val;
+                for (int i = 0; i < lval.size(); i++) {
+                    String v = lval.get(i);
+                    res += "&"+key+"="+ java.net.URLEncoder.encode(v, "ISO-8859-1");
+                }
+            }
         }
         if (res.length()>0) {
             res = res.substring(1);

@@ -42,8 +42,8 @@ public class Group extends BaseObject {
     }
 
     @Override
-    Hashtable<String,String> getParams() {
-        Hashtable<String,String> res = new Hashtable<String,String>();
+    Hashtable<String,Object> getParams() {
+        Hashtable<String,Object> res = new Hashtable<String,Object>();
         putNotNull(res, "Name", name);
         putNotNull(res, "Note", note);
         return res;

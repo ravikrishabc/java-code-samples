@@ -3,7 +3,7 @@ package com.EzTexting;
 import java.util.Hashtable;
 import java.util.List;
 
-abstract class BaseObject {
+public abstract class BaseObject {
 
     public String id;
 
@@ -13,9 +13,9 @@ abstract class BaseObject {
 
     abstract String getBaseUrl();
 
-    abstract Hashtable<String,String> getParams();
+    abstract Hashtable<String,Object> getParams();
 
-    protected void putList(Hashtable<String, String> res, String key, List<String> vals) {
+    protected void putList(Hashtable<String, Object> res, String key, List<String> vals) {
         if (vals != null) {
             for (int i = 0; i < vals.size(); i++) {
                 String val = vals.get(i);
@@ -24,9 +24,13 @@ abstract class BaseObject {
         }
     }
 
-    static void putNotNull(Hashtable<String, String> res, String key, String val) {
+    static void putNotNull(Hashtable<String, Object> res, String key, String val) {
         if (val != null) {
             res.put(key, val);
         }
+    }
+
+    protected boolean hasResponseAfterUpdate() {
+        return true;
     }
 }
